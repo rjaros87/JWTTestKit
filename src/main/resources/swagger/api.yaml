@@ -17,6 +17,8 @@ servers:
 tags:
 - name: JWT Test Kit
   description: APIs for JWT token generation and key management
+- name: Secret
+  description: Endpoints for testing generated JWT.
 paths:
   /JWTTestKit/jwks:
     get:
@@ -145,6 +147,27 @@ paths:
           description: Invalid request - missing or malformed request body
           content:
             application/json: {}
+  /secret:
+    get:
+      tags:
+      - Secret
+      summary: Retrieve Secret Message
+      description: Retrieves a secret message for an authenticated user. JWT requires
+        at least 'sub' claim.
+      operationId: secret
+      responses:
+        "200":
+          description: Successfully retrieved secret message
+          content:
+            application/json:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized - user is not authenticated
+          content:
+            application/json: {}
+      security:
+      - bearerAuth: []
 components:
   schemas:
     AWSCognitoToken:
@@ -274,3 +297,8 @@ components:
         expires_in:
           type: integer
           format: int64
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

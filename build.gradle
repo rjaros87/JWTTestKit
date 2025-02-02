@@ -50,11 +50,15 @@ java {
 
 tasks {
     dockerBuild {
-        images = ["${System.env.DOCKER_IMAGE ?: project.name}:$project.version"]
+        images = ["${System.env.DOCKER_IMAGE ?: project.name}:$project.version".toLowerCase()]
     }
 
     dockerBuildNative {
-        images = ["${System.env.DOCKER_IMAGE ?: project.name}:$project.version"]
+        images = ["${System.env.DOCKER_IMAGE ?: project.name}:${project.version}-native".toLowerCase()]
+    }
+
+    optimizedDockerBuildNative {
+        images = ["${System.env.DOCKER_IMAGE ?: project.name}:${project.version}-optimized-native".toLowerCase()]
     }
 }
 
