@@ -1,0 +1,276 @@
+openapi: 3.0.1
+info:
+  title: JWT Test Kit API
+  description: "API for generating and managing JWT tokens for testing purposes. Provides\
+    \ endpoints for creating various types of JWT tokens including AWS Cognito, Okta,\
+    \ and custom tokens, as well as managing RSA keys for token signing."
+  contact:
+    name: Radoslaw Jaros
+    url: https://github.com/rjaros87/JWTTestKit
+  license:
+    name: Apache 2.0
+    url: https://github.com/rjaros87/JWTTestKit/blob/main/LICENSE
+  version: "1.0"
+servers:
+- url: http://localhost:8080
+  description: Local Development Server
+tags:
+- name: JWT Test Kit
+  description: APIs for JWT token generation and key management
+paths:
+  /JWTTestKit/jwks:
+    get:
+      tags:
+      - JWT Test Kit
+      summary: Get JWKS
+      description: Retrieves the JSON Web Key Set (JWKS) containing the public key
+        for token verification
+      operationId: jwks
+      responses:
+        "200":
+          description: Successfully retrieved JWKS
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /JWTTestKit/keys:
+    get:
+      tags:
+      - JWT Test Kit
+      summary: Get RSA Keys
+      description: Retrieves the RSA key pair in PEM format for token signing and
+        verification
+      operationId: keys
+      responses:
+        "200":
+          description: Successfully retrieved RSA keys
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeysResponse"
+  /JWTTestKit/token:
+    get:
+      tags:
+      - JWT Test Kit
+      summary: Generate Sample Token
+      description: Generates a sample JWT token with predefined claims
+      operationId: generateSampleToken
+      responses:
+        "200":
+          description: Successfully generated token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /JWTTestKit/token/aws-cognito:
+    post:
+      tags:
+      - JWT Test Kit
+      summary: Create AWS Cognito Token
+      description: "Creates a JWT token with AWS Cognito-compatible claims. Requires\
+        \ at least an empty JSON object {} as request body."
+      operationId: createCognitoToken
+      requestBody:
+        description: AWS Cognito token claims
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AWSCognitoToken"
+        required: true
+      responses:
+        "200":
+          description: Successfully generated token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          description: Invalid request - missing or malformed request body
+          content:
+            application/json: {}
+  /JWTTestKit/token/custom:
+    post:
+      tags:
+      - JWT Test Kit
+      summary: Create Custom Token
+      description: "Creates a JWT token with custom claims. Requires at least an empty\
+        \ JSON object {} as request body."
+      operationId: createCustomToken
+      requestBody:
+        description: Custom token claims
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomToken"
+        required: true
+      responses:
+        "200":
+          description: Successfully generated token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          description: Invalid request - missing or malformed request body
+          content:
+            application/json: {}
+        "500":
+          description: Error generating token
+          content:
+            application/json: {}
+  /JWTTestKit/token/okta:
+    post:
+      tags:
+      - JWT Test Kit
+      summary: Create Okta Token
+      description: "Creates a JWT token with Okta-compatible claims. Requires at least\
+        \ an empty JSON object {} as request body."
+      operationId: createOktaToken
+      requestBody:
+        description: Okta token claims
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OktaToken"
+        required: true
+      responses:
+        "200":
+          description: Successfully generated token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          description: Invalid request - missing or malformed request body
+          content:
+            application/json: {}
+components:
+  schemas:
+    AWSCognitoToken:
+      required:
+      - auth_time
+      - client_id
+      - cognito:groups
+      - device_key
+      - event_id
+      - exp
+      - iat
+      - iss
+      - jti
+      - origin_jti
+      - scope
+      - sub
+      - token_use
+      - username
+      - version
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/AbstractTokenHelper"
+      - properties:
+          exp:
+            type: integer
+            format: int64
+          sub:
+            type: string
+          device_key:
+            type: string
+          cognito:groups:
+            type: array
+            items:
+              type: string
+          iss:
+            type: string
+          version:
+            type: integer
+            format: int32
+          client_id:
+            type: string
+          origin_jti:
+            type: string
+          event_id:
+            type: string
+          token_use:
+            type: string
+          scope:
+            type: string
+          auth_time:
+            type: integer
+            format: int64
+          iat:
+            type: integer
+            format: int64
+          jti:
+            type: string
+          username:
+            type: string
+    AbstractTokenHelper:
+      type: object
+    CustomToken:
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/AbstractTokenHelper"
+      - properties:
+          exp:
+            type: integer
+            format: int64
+          customClaims:
+            type: object
+            additionalProperties: true
+    KeysResponse:
+      required:
+      - private_key
+      - public_key
+      type: object
+      properties:
+        private_key:
+          type: string
+        public_key:
+          type: string
+    OktaToken:
+      required:
+      - aud
+      - email
+      - exp
+      - groups
+      - iat
+      - iss
+      - name
+      - preferred_username
+      - sub
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/AbstractTokenHelper"
+      - properties:
+          sub:
+            type: string
+          name:
+            type: string
+          preferred_username:
+            type: string
+          email:
+            type: string
+          groups:
+            type: array
+            items:
+              type: string
+          exp:
+            type: integer
+            format: int64
+          iat:
+            type: integer
+            format: int64
+          iss:
+            type: string
+          aud:
+            type: string
+    TokenResponse:
+      type: object
+      properties:
+        token_type:
+          type: string
+        access_token:
+          type: string
+        expires_in:
+          type: integer
+          format: int64

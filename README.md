@@ -1,108 +1,112 @@
-## Micronaut 4.7.4 Documentation
+# JWT Test Kit 🔐
 
-- [User Guide](https://docs.micronaut.io/4.7.4/guide/index.html)
-- [API Reference](https://docs.micronaut.io/4.7.4/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/4.7.4/guide/configurationreference.html)
-- [Micronaut Guides](https://guides.micronaut.io/index.html)
----
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/projects/jdk/21/)
+[![Micronaut](https://img.shields.io/badge/Micronaut-4.7-green.svg)](https://micronaut.io/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-## Push GraalVM Native Image To Docker Registry Workflow
+A powerful Micronaut-based toolkit for generating and managing JWT tokens for testing purposes. Perfect for developers who need to simulate identity provider tokens during development and testing phases.
 
-Workflow file: [`.github/workflows/graalvm.yml`](.github/workflows/graalvm.yml)
+## ✨ Features
 
-### Workflow description
-For pushes to the `master` branch, the workflow will:
-1. Setup the build environment with respect to the selected java/graalvm version.
-2. Login to docker registry based on provided configuration.
-3. Build, tag and push Docker image with Micronaut application to the Docker container image.
+- 🎯 Generate JWT tokens with custom claims
+- 🔄 Support for common identity providers:
+  - Okta
+  - AWS Cognito
+- 📚 Interactive Swagger UI documentation
+- 🏥 Health check endpoints for Kubernetes
+- 🐳 Docker support
+- ⚡ Native image support with GraalVM
 
-### Dependencies on other GitHub Actions
-- [Docker login](`https://github.com/docker/login-action`)(`docker/login`)
-- [Setup GraalVM](`https://github.com/DeLaGuardo/setup-graalvm`)(`DeLaGuardo/setup-graalvm`)
+## 🚀 Getting Started
 
-### Setup
-Add the following GitHub secrets:
+### Prerequisites
 
-| Name | Description |
-| ---- | ----------- |
-| DOCKER_USERNAME | Username for Docker registry authentication. |
-| DOCKER_PASSWORD | Docker registry password. |
-| DOCKER_REPOSITORY_PATH | Path to the docker image repository inside the registry, e.g. for the image `foo/bar/micronaut:0.1` it is `foo/bar`. |
-| DOCKER_REGISTRY_URL | Docker registry url. |
-#### Configuration examples
-Specifics on how to configure public cloud docker registries like DockerHub, Google Container Registry (GCR), AWS Container Registry (ECR),
-Oracle Cloud Infrastructure Registry (OCIR) and many more can be found in [docker/login-action](https://github.com/docker/login-action)
-documentation.
+- Java 21 or higher
+- Gradle 8.x (included via wrapper)
 
-#### DockerHub
+### Running the Application
 
-- `DOCKER_USERNAME` - DockerHub username
-- `DOCKER_PASSWORD` - DockerHub password or personal access token
-- `DOCKER_REPOSITORY_PATH` - DockerHub organization or the username in case of personal registry
-- `DOCKER_REGISTRY_URL` - No need to configure for DockerHub
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/rjaros87/JWTTestKit.git
+   cd JWTTestKit
+   ```
 
-> See [docker/login-action for DockerHub](https://github.com/docker/login-action#dockerhub)
+2. Build and run using Gradle:
+   ```bash
+   ./gradlew run
+   ```
 
-#### Google Container Registry (GCR)
-Create service account with permission to edit GCR or use predefined Storage Admin role.
+   Or build a native image:
+   ```bash
+   ./gradlew nativeCompile
+   ```
 
-- `DOCKER_USERNAME` - set exactly to `_json_key`
-- `DOCKER_PASSWORD` - content of the service account json key file
-- `DOCKER_REPOSITORY_PATH` - `<project-id>/foo`
-- `DOCKER_REGISTRY_URL` - `gcr.io`
+3. The application will start on port 8080 by default
 
-> See [docker/login-action for GCR](https://github.com/docker/login-action#google-container-registry-gcr)
+### 🐳 Docker Support
 
-#### AWS Elastic Container Registry (ECR)
-Create IAM user with permission to push to ECR (or use AmazonEC2ContainerRegistryFullAccess role).
+Build Docker image:
+```bash
+./gradlew dockerBuild
+```
 
-- `DOCKER_USERNAME` - access key ID
-- `DOCKER_PASSWORD` - secret access key
-- `DOCKER_REPOSITORY_PATH` - no need to set
-- `DOCKER_REGISTRY_URL` - set to `<aws-account-number>.dkr.ecr.<region>.amazonaws.com`
+Build native Docker image:
+```bash
+./gradlew dockerBuildNative
+```
 
-> See [docker/login-action for ECR](https://github.com/docker/login-action#aws-elastic-container-registry-ecr)
+## 🔧 API Endpoints
 
-#### Oracle Infrastructure Cloud Registry (OCIR)
-[Create auth token](https://www.oracle.com/webfolder/technetwork/tutorials/obe/oci/registry/index.html#GetanAuthToken) for authentication.
+### JWT Token Generation
 
-- `DOCKER_USERNAME` - username in format `<tenancy>/<username>`
-- `DOCKER_PASSWORD` - account auth token
-- `DOCKER_REPOSITORY_PATH` - `<tenancy>/<registry>/foo`
-- `DOCKER_REGISTRY_URL` - set to `<region>.ocir.io`
+#### Create Okta Token
+- **URL:** `/JWTTestKit/token/okta`
+- **Method:** `POST`
+- **Request Body Example:**
+  ```json
+  {
+    "sub": "user123",
+    "email": "user@example.com",
+    "groups": ["admin", "user"]
+  }
+  ```
 
-> See [docker/login-action for OCIR](https://github.com/docker/login-action#oci-oracle-cloud-infrastructure-registry-ocir)
+#### Create Custom Token
+- **URL:** `/JWTTestKit/token/custom`
+- **Method:** `POST`
+- **Request Body:** Flexible JSON object with custom claims
 
+### Management
 
-- [Shadow Gradle Plugin](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow)
-- [Micronaut Gradle Plugin documentation](https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/)
-- [GraalVM Gradle Plugin documentation](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
-## Feature swagger-ui documentation
+#### Health Check
+- **URL:** `/health`
+- **Method:** `GET`
+- **Port:** 8082 (configurable via `MANAGEMENT_PORT`)
 
-- [Micronaut Swagger UI documentation](https://micronaut-projects.github.io/micronaut-openapi/latest/guide/index.html)
+## 📚 Documentation
 
-- [https://swagger.io/tools/swagger-ui/](https://swagger.io/tools/swagger-ui/)
+- **Swagger UI:** Access the interactive API documentation at http://localhost:8080/api
+- **OpenAPI Spec:** Available at http://localhost:8080/swagger/api.yml
 
+## ⚙️ Configuration
 
-## Feature openapi documentation
+Key configurations can be adjusted in `application.yml`:
+- Server ports
+- JWT signing keys
+- Token expiration times
+- Management endpoints
 
-- [Micronaut OpenAPI Support documentation](https://micronaut-projects.github.io/micronaut-openapi/latest/guide/index.html)
+## 🛠️ Building from Source
 
-- [https://www.openapis.org](https://www.openapis.org)
+```bash
+./gradlew clean build
+```
 
+## 📄 License
 
-## Feature micronaut-aot documentation
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
-- [Micronaut AOT documentation](https://micronaut-projects.github.io/micronaut-aot/latest/guide/)
+## 🤝 Contributing
 
-
-## Feature serialization-jackson documentation
-
-- [Micronaut Serialization Jackson Core documentation](https://micronaut-projects.github.io/micronaut-serialization/latest/guide/)
-
-
-## Feature github-workflow-graal-docker-registry documentation
-
-- [https://docs.github.com/en/free-pro-team@latest/actions](https://docs.github.com/en/free-pro-team@latest/actions)
-
-
+Contributions are welcome! Please feel free to submit a Pull Request.

@@ -1,24 +1,45 @@
 micronaut:
   application:
     name: JWTTestKit
+
   server:
     port: ${APPLICATION_PORT:8080}
+
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:swagger
+        mapping: /swagger/**
+      swagger-ui-res:
+        paths: classpath:META-INF/swagger/views/swagger-ui/res
+        mapping: /swagger-ui/res/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /api/**
+
+  openapi:
+    target:
+      file: "src/main/resources/swagger/api.yaml"
+
   security:
     enabled: true
+    intercept-url-map:
+      - pattern: /api/**
+        access:
+          - isAnonymous()
+      - pattern: /swagger/**
+        access:
+          - isAnonymous()
+      - pattern: /swagger-ui/**
+        access:
+          - isAnonymous()
+
     token:
       jwt:
         signatures:
           jwks:
             JWTTestKit:
               url: http://localhost:8080/JWTTestKit/jwks
-  router:
-    static-resources:
-      swagger:
-        paths: classpath:META-INF/swagger
-        mapping: /swagger/**
-      swagger-ui:
-        paths: classpath:META-INF/swagger/views/swagger-ui
-        mapping: /swagger-ui/**
 
 endpoints:
   all:
@@ -27,3 +48,23 @@ endpoints:
     enabled: true
     sensitive: false
     details-visible: NEVER
+
+netty:
+  default:
+    allocator:
+      max-order: 3
+
+
+#api:
+#  version: 1.0.0
+#
+#openapi:
+#  target:
+#    file: "src/main/resources/swagger"
+#  info:
+#    title: JWT Test Kit API
+#    version: ${api.version}
+#    description: API for generating and managing JWT tokens for testing purposes
+#  tags:
+#    - name: JWT Test Kit
+#      description: APIs for JWT token generation and key management

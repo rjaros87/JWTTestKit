@@ -22,7 +22,8 @@ dependencies {
     implementation("io.micronaut.serde:micronaut-serde-jackson")
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("net.datafaker:datafaker:2.4.2")
-
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.20")
+    implementation("io.micronaut.openapi:micronaut-openapi")
 
     compileOnly("io.micronaut:micronaut-http-client")
     compileOnly("io.micronaut.openapi:micronaut-openapi-annotations")
@@ -56,6 +57,12 @@ tasks {
         images = ["${System.env.DOCKER_IMAGE ?: project.name}:$project.version"]
     }
 }
+
+tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs << "-Dmicronaut.openapi.expand.api.version=${project.version}".toString()
+}
+
 graalvmNative.toolchainDetection = false
 
 micronaut {
@@ -83,5 +90,3 @@ micronaut {
 tasks.named("dockerfileNative") {
     jdkVersion = "21"
 }
-
-
