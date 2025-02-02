@@ -4,7 +4,7 @@ plugins {
     id("io.micronaut.aot") version "4.4.4"
 }
 
-version = "0.1"
+version = "1.0"
 group = "io.github.rjaros87"
 
 repositories {
@@ -15,12 +15,26 @@ dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.openapi:micronaut-openapi")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    annotationProcessor("org.projectlombok:lombok")
+
+    implementation("io.micronaut:micronaut-management")
+    implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
+    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("net.datafaker:datafaker:2.4.2")
+
+
     compileOnly("io.micronaut:micronaut-http-client")
     compileOnly("io.micronaut.openapi:micronaut-openapi-annotations")
+    compileOnly("org.projectlombok:lombok")
+
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("org.yaml:snakeyaml")
+
     testImplementation("io.micronaut:micronaut-http-client")
+
+    aotPlugins(platform("io.micronaut.platform:micronaut-platform:4.7.4"))
+    aotPlugins("io.micronaut.security:micronaut-security-aot")
 }
 
 
