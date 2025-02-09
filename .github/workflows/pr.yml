@@ -1,7 +1,8 @@
-name: JWTTestKit Docker Build
-on: [push, pull_request]
+name: JWTTestKit Pull Request Validation
+on: [pull_request]
 jobs:
   build-standard:
+    name: Standard build and test
     runs-on: ubuntu-latest
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository }}
@@ -28,10 +29,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build&Push Image
-        run: ./gradlew dockerPush -i --no-daemon
+      - name: Build Image
+        run: ./gradlew dockerBuild -i --no-daemon
 
   build-native:
+    name: Native build and test
     runs-on: ubuntu-latest
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository }}
@@ -50,7 +52,7 @@ jobs:
           validate-wrappers: true
 
       - name: Run Tests
-        run: ./gradlew test -i --no-daemon
+        run: ./gradlew nativeTest -i --no-daemon
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -59,5 +61,5 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build&Push Native Image
-        run: ./gradlew optimizedDockerPushNative -i --no-daemon
+      - name: Build Native Image
+        run: ./gradlew optimizedDockerBuildNative -i --no-daemon
