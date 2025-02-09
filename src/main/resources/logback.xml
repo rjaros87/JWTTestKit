@@ -1,5 +1,4 @@
 <configuration>
-
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
@@ -8,7 +7,9 @@
         </encoder>
     </appender>
 
-    <root level="info">
+    <logger name="io.github.rjaros87" level="${LOG_LEVEL:-info}" />
+
+    <root level="${ROOT_LOG_LEVEL:-info}">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

@@ -53,18 +53,3 @@ netty:
   default:
     allocator:
       max-order: 3
-
-
-#api:
-#  version: 1.0.0
-#
-#openapi:
-#  target:
-#    file: "src/main/resources/swagger"
-#  info:
-#    title: JWT Test Kit API
-#    version: ${api.version}
-#    description: API for generating and managing JWT tokens for testing purposes
-#  tags:
-#    - name: JWT Test Kit
-#      description: APIs for JWT token generation and key management

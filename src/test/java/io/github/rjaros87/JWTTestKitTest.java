@@ -4,6 +4,7 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.runtime.EmbeddedApplication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -82,12 +83,26 @@ class JWTTestKitControllerTest {
     }
 
     @Test
-    void testCustomTokenEndpoint() {
+    void testCustomTokenEndpoint_withoutSub() {
         Map<String, Object> customToken = Map.of();
+
+        HttpRequest<Map> request = HttpRequest.POST("/JWTTestKit/token/custom", customToken);
+        try {
+            client.toBlocking().exchange(request, Map.class);
+            Assertions.fail("Expected HttpClientResponseException to be thrown");
+        } catch (HttpClientResponseException e) {
+            Assertions.assertEquals(400, e.getStatus().getCode());
+        }
+    }
+
+    @Test
+    void testCustomTokenEndpoint() {
+        Map<String, Object> customToken = Map.of("sub", "test-sub");
 
         HttpRequest<Map> request = HttpRequest.POST("/JWTTestKit/token/custom", customToken);
         HttpResponse<Map> response = client.toBlocking().exchange(request, Map.class);
         Assertions.assertEquals(200, response.code());
+
         Map<String, Object> token = response.body();
         Assertions.assertNotNull(token);
         Assertions.assertNotNull(token.get("access_token"));

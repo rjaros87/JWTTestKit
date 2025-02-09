@@ -1,19 +1,13 @@
 package io.github.rjaros87.jwttestkit.controller;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.crypto.RSASSASigner;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
-import io.github.rjaros87.jwttestkit.model.Claims;
 import io.github.rjaros87.jwttestkit.model.KeysResponse;
 import io.github.rjaros87.jwttestkit.model.TokenResponse;
 import io.github.rjaros87.jwttestkit.model.awscognito.AWSCognitoToken;
 import io.github.rjaros87.jwttestkit.model.custom.CustomToken;
 import io.github.rjaros87.jwttestkit.model.okta.OktaToken;
 import io.github.rjaros87.jwttestkit.model.sample.SampleToken;
-import io.github.rjaros87.jwttestkit.utils.JWTUtils;
+import io.github.rjaros87.jwttestkit.utils.TokenSigner;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
@@ -30,9 +24,9 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Map;
 
 /**
@@ -41,30 +35,13 @@ import java.util.Map;
  * and managing RSA keys used for token signing.
  */
 @Secured(SecurityRule.IS_ANONYMOUS)
+@Slf4j
 @Controller("/JWTTestKit")
 @Tag(name = "JWT Test Kit", description = "APIs for JWT token generation and key management")
 public class JWTTestKitController {
 
-    private static final int RSA_KEY_SIZE = 2048;
-
-    private final JWK jwk;
-    private final JWSSigner signer;
-    private final PrivateKey privateKey;
-    private final PublicKey publicKey;
-
-    /**
-     * Initializes the controller by generating RSA key pair and setting up the JWT signer.
-     *
-     * @throws JOSEException if there's an error during key generation or signer initialization
-     */
-    public JWTTestKitController() throws JOSEException {
-        jwk = new RSAKeyGenerator(RSA_KEY_SIZE)
-                .keyID(JWTUtils.generateKeyId())
-                .generate();
-        privateKey = jwk.toRSAKey().toPrivateKey();
-        publicKey = jwk.toRSAKey().toRSAPublicKey();
-        signer = new RSASSASigner(privateKey);
-    }
+    @Inject
+    private TokenSigner tokenSigner;
 
     /**
      * Retrieves the RSA key pair in PEM format.
@@ -87,7 +64,7 @@ public class JWTTestKitController {
     )
     @Get("/keys")
     public KeysResponse keys() {
-        return new KeysResponse(JWTUtils.getPrivateKeyPem(privateKey), JWTUtils.getPublicKeyPem(publicKey));
+        return tokenSigner.getKeys();
     }
 
     /**
@@ -111,8 +88,7 @@ public class JWTTestKitController {
     )
     @Get("/jwks")
     public Map<String, Object> jwks() {
-        JWKSet jwkSet = new JWKSet(jwk.toPublicJWK());
-        return jwkSet.toJSONObject();
+        return tokenSigner.getJwks();
     }
 
     /**
@@ -138,8 +114,7 @@ public class JWTTestKitController {
     @Get("/token")
     @Consumes(MediaType.APPLICATION_JSON)
     public HttpResponse<TokenResponse> generateSampleToken() throws JOSEException {
-        Claims claims = new SampleToken();
-        return HttpResponse.ok(new TokenResponse(claims, jwk, signer));
+        return HttpResponse.ok(tokenSigner.sign(new SampleToken()));
     }
 
     /**
@@ -171,35 +146,35 @@ public class JWTTestKitController {
     @Post("/token/aws-cognito")
     @Consumes(MediaType.APPLICATION_JSON)
     public HttpResponse<TokenResponse> createCognitoToken(
-            @Parameter(
-                description = "AWS Cognito token claims (at least empty JSON {})",
-                required = true,
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = AWSCognitoToken.class),
-                    examples = {
-                        @ExampleObject(
-                            name = "Empty request",
-                            value = "{}",
-                            description = "Minimum required request body"
-                        ),
-                        @ExampleObject(
-                            name = "Full request",
-                            value = """
-                            {
-                                "sub": "user123",
-                                "client_id": "6f092efa-d035-403a-97da-7c9123c9e620",
-                                "scope": "my-scope",
-                                "username": "John_Doe"
-                            }
-                            """,
-                            description = "Request with all available fields - see AWS Cognito documentation for more details"
-                        )
-                    }
-                )
+        @Parameter(
+            description = "AWS Cognito token claims (at least empty JSON {})",
+            required = true,
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = AWSCognitoToken.class),
+                examples = {
+                    @ExampleObject(
+                        name = "Empty request",
+                        value = "{}",
+                        description = "Minimum required request body"
+                    ),
+                    @ExampleObject(
+                        name = "Full request",
+                        value = """
+                        {
+                            "sub": "user123",
+                            "client_id": "6f092efa-d035-403a-97da-7c9123c9e620",
+                            "scope": "my-scope",
+                            "username": "John_Doe"
+                        }
+                        """,
+                        description = "Request with all available fields - see AWS Cognito documentation for more details"
+                    )
+                }
             )
-            @Body AWSCognitoToken body) throws JOSEException {
-        return HttpResponse.ok(new TokenResponse(body, jwk, signer));
+        )
+        @Body AWSCognitoToken body) throws JOSEException {
+        return HttpResponse.ok(tokenSigner.sign(body));
     }
 
     /**
@@ -231,35 +206,35 @@ public class JWTTestKitController {
     @Post("/token/okta")
     @Consumes(MediaType.APPLICATION_JSON)
     public HttpResponse<TokenResponse> createOktaToken(
-            @Parameter(
-                description = "Okta token claims (at least empty JSON {})",
-                required = true,
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = OktaToken.class),
-                    examples = {
-                        @ExampleObject(
-                            name = "Empty request",
-                            value = "{}",
-                            description = "Minimum required request body"
-                        ),
-                        @ExampleObject(
-                            name = "Full request",
-                            value = """
-                            {
-                                "sub": "user123",
-                                "email": "user@example.com",
-                                "name": "John Doe",
-                                "groups": ["Users", "Admins"]
-                            }
-                            """,
-                            description = "Request with all available fields - see Okta documentation for more details"
-                        )
-                    }
-                )
+        @Parameter(
+            description = "Okta token claims (at least empty JSON {})",
+            required = true,
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = OktaToken.class),
+                examples = {
+                    @ExampleObject(
+                        name = "Empty request",
+                        value = "{}",
+                        description = "Minimum required request body"
+                    ),
+                    @ExampleObject(
+                        name = "Full request",
+                        value = """
+                        {
+                            "sub": "user123",
+                            "email": "user@example.com",
+                            "name": "John Doe",
+                            "groups": ["Users", "Admins"]
+                        }
+                        """,
+                        description = "Request with all available fields - see Okta documentation for more details"
+                    )
+                }
             )
-            @Body OktaToken body) throws JOSEException {
-        return HttpResponse.ok(new TokenResponse(body, jwk, signer));
+        )
+        @Body OktaToken body) throws JOSEException {
+        return HttpResponse.ok(tokenSigner.sign(body));
     }
 
     /**
@@ -296,34 +271,39 @@ public class JWTTestKitController {
     @Post("/token/custom")
     @Consumes(MediaType.APPLICATION_JSON)
     public HttpResponse<TokenResponse> createCustomToken(
-            @Parameter(
-                description = "Custom token claims (at least empty JSON {})",
-                required = true,
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = CustomToken.class),
-                    examples = {
-                        @ExampleObject(
-                            name = "Empty request",
-                            value = "{}",
-                            description = "Minimum required request body"
-                        ),
-                        @ExampleObject(
-                            name = "Full request",
-                            value = """
-                            {
-                                "sub": "user123",
-                                "customClaim1": "value1",
-                                "customClaim2": "value2",
-                                "roles": ["role1", "role2"]
-                            }
-                            """,
-                            description = "Request with example custom claims"
-                        )
-                    }
-                )
+        @Parameter(
+            description = "Custom token claims (at least empty JSON {})",
+            required = true,
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = CustomToken.class),
+                examples = {
+                    @ExampleObject(
+                        name = "Empty request",
+                        value = "{}",
+                        description = "Minimum required request body"
+                    ),
+                    @ExampleObject(
+                        name = "Full request",
+                        value = """
+                        {
+                            "sub": "user123",
+                            "customClaim1": "value1",
+                            "customClaim2": "value2",
+                            "roles": ["role1", "role2"]
+                        }
+                        """,
+                        description = "Request with example custom claims"
+                    )
+                }
             )
-            @Body CustomToken body) throws JOSEException {
-        return HttpResponse.ok(new TokenResponse(body, jwk, signer));
+        )
+        @Body CustomToken body) throws JOSEException {
+        try {
+            return HttpResponse.ok(tokenSigner.sign(body));
+        } catch (IllegalArgumentException e) {
+            log.error("Error generating custom token due to: {}", e.getMessage());
+            return HttpResponse.badRequest();
+        }
     }
 }

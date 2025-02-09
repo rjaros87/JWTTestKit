@@ -21,7 +21,6 @@ dependencies {
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
     implementation("io.micronaut:micronaut-jackson-databind")
-    implementation("net.datafaker:datafaker:2.4.2")
     implementation("io.swagger.core.v3:swagger-annotations:2.2.20")
     implementation("io.micronaut.openapi:micronaut-openapi")
 

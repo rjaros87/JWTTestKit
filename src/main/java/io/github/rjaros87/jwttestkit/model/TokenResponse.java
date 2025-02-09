@@ -1,18 +1,15 @@
 package io.github.rjaros87.jwttestkit.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JOSEObjectType;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jose.jwk.JWK;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Represents a response containing a JWT token.
+ */
+@Slf4j
 @Introspected
 @Serdeable
 @Getter
@@ -27,20 +24,14 @@ public class TokenResponse {
     @JsonProperty("expires_in")
     private final long expiresIn;
 
-    public TokenResponse(Claims claims, JWK jwk, JWSSigner signer) throws JOSEException {
-        expiresIn = claims.getExp();
-
-        // Create signed JWT
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .keyID(jwk.getKeyID())
-                .type(JOSEObjectType.JWT)
-                .build();
-
-        Payload payload = new Payload(claims.toMap());
-        JWSObject jwsObject = new JWSObject(header, payload);
-
-        jwsObject.sign(signer);
-
-        accessToken = jwsObject.serialize();
+    /**
+     * Constructs a new TokenResponse with the specified access token and expiration time.
+     *
+     * @param accessToken the access token
+     * @param exp the expiration time in seconds
+     */
+    public TokenResponse(String accessToken, Long exp) {
+        this.expiresIn = exp;
+        this.accessToken = accessToken;
     }
 }
