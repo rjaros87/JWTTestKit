@@ -2,6 +2,7 @@ name: JWTTestKit Pull Request Validation
 on: [pull_request]
 jobs:
   build-standard:
+    name: Standard build and test
     runs-on: ubuntu-latest
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository }}
@@ -32,6 +33,7 @@ jobs:
         run: ./gradlew dockerBuild -i --no-daemon
 
   build-native:
+    name: Native build and test
     runs-on: ubuntu-latest
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository }}

@@ -5,6 +5,7 @@ on:
       - main
 jobs:
   build-standard:
+    name: Standard build and push image
     runs-on: ubuntu-latest
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository }}
@@ -35,6 +36,7 @@ jobs:
         run: ./gradlew dockerPush -i --no-daemon
 
   build-native:
+    name: Native build and push image
     runs-on: ubuntu-latest
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository }}
