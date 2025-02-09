@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - main
+
+permissions:
+  packages: write
+
 jobs:
   build-standard:
     name: Standard build and push image
@@ -18,15 +22,15 @@ jobs:
           java-version: '21'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@ac2d340dc04d9e1113182899e983b5400c17cda1
         with:
           validate-wrappers: true
 
       - name: Run Tests
-        run: ./gradlew nativeTest -i --no-daemon
+        run: ./gradlew test -i --no-daemon
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -50,15 +54,15 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@ac2d340dc04d9e1113182899e983b5400c17cda1
         with:
           validate-wrappers: true
 
       - name: Run Tests
-        run: ./gradlew test -i --no-daemon
+        run: ./gradlew nativeTest -i --no-daemon
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
