@@ -28,7 +28,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build&Push Image
+      - name: Build Image
         run: ./gradlew dockerBuild -i --no-daemon
 
   build-native:
@@ -59,5 +59,5 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build&Push Native Image
+      - name: Build Native Image
         run: ./gradlew optimizedDockerBuildNative -i --no-daemon
