@@ -1,5 +1,8 @@
 name: JWTTestKit Pull Request Validation
 on: [pull_request]
+
+permissions: {}
+
 jobs:
   build:
     name: Standard build and test
