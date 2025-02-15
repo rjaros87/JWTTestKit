@@ -5,6 +5,17 @@ plugins {
 }
 
 group = "io.github.rjaros87"
+description = "JWTTestKit is a lightweight tool for testing JWT-based authentication. It generates tokens and " +
+    "hosts a mock JWKS endpoint, simplifying the simulation of authentication flows without real-world services."
+
+Map<String, String> dockerLabels = Map.of(
+    "org.opencontainers.image.title", project.name,
+    "org.opencontainers.image.version", project.version as String,
+    "org.opencontainers.image.description", project.description,
+    "org.opencontainers.image.licenses", "Apache-2.0",
+    "org.opencontainers.image.source", "https://github.com/rjaros87/JWTTestKit",
+    "org.opencontainers.image.created", new Date().format("yyyy-MM-dd'T'HH:mm:ssXXX")
+)
 
 repositories {
     mavenCentral()
@@ -49,14 +60,17 @@ java {
 tasks {
     dockerBuild {
         images = ["${System.env.DOCKER_IMAGE ?: project.name}:$project.version".toLowerCase()]
+        labels = dockerLabels
     }
 
     dockerBuildNative {
         images = ["${System.env.DOCKER_IMAGE ?: project.name}:${project.version}-native".toLowerCase()]
+        labels = dockerLabels
     }
 
     optimizedDockerBuildNative {
         images = ["${System.env.DOCKER_IMAGE ?: project.name}:${project.version}-optimized-native".toLowerCase()]
+        labels = dockerLabels
     }
 }
 
@@ -87,7 +101,6 @@ micronaut {
         replaceLogbackXml = true
     }
 }
-
 
 tasks.named("dockerfileNative") {
     jdkVersion = "21"
