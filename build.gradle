@@ -43,7 +43,7 @@ dependencies {
 
     testImplementation("io.micronaut:micronaut-http-client")
 
-    aotPlugins(platform("io.micronaut.platform:micronaut-platform:4.7.5"))
+    aotPlugins(platform("io.micronaut.platform:micronaut-platform:4.7.6"))
     aotPlugins("io.micronaut.security:micronaut-security-aot")
 }
 
