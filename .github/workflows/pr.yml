@@ -1,7 +1,8 @@
 name: JWTTestKit Pull Request Validation
 on: [pull_request]
 
-permissions: {}
+permissions:
+  packages: write
 
 jobs:
   build:
@@ -25,14 +26,7 @@ jobs:
       - name: Run Tests
         run: ./gradlew test -i --no-daemon
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Image
+      - name: Test Build Image
         run: ./gradlew dockerBuild -i --no-daemon
 
   build-native:
@@ -41,7 +35,7 @@ jobs:
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - uses: graalvm/setup-graalvm@aafbedb8d382ed0ca6167d3a051415f20c859274
         with:
@@ -57,12 +51,15 @@ jobs:
       - name: Run Tests
         run: ./gradlew nativeTest -i --no-daemon
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Native Image
+      - name: Test Build Native Image
         run: ./gradlew optimizedDockerBuildNative -i --no-daemon
+
+  cleanup:
+    name: ghcr.io cleanup action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          package: jwttestkit
+          dry-run: true

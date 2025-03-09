@@ -14,7 +14,8 @@ Map<String, String> dockerLabels = Map.of(
     "org.opencontainers.image.description", project.description,
     "org.opencontainers.image.licenses", "Apache-2.0",
     "org.opencontainers.image.source", "https://github.com/rjaros87/JWTTestKit",
-    "org.opencontainers.image.created", new Date().format("yyyy-MM-dd'T'HH:mm:ssXXX")
+    "org.opencontainers.image.created", new Date().format("yyyy-MM-dd'T'HH:mm:ssXXX"),
+    "org.opencontainers.image.authors", "Radoslaw Jaros"
 )
 
 repositories {
@@ -63,16 +64,42 @@ tasks {
         labels = dockerLabels
     }
 
-    dockerBuildNative {
-        images = ["${System.env.DOCKER_IMAGE ?: project.name}:${project.version}-native".toLowerCase()]
-        labels = dockerLabels
-    }
-
     optimizedDockerBuildNative {
         images = ["${System.env.DOCKER_IMAGE ?: project.name}:${project.version}-optimized-native".toLowerCase()]
         labels = dockerLabels
     }
 }
+
+
+
+//docker buildx create --name multiarch --driver docker-container --use
+def registerDockerBuildTask(String taskName, List<String> dependencies, String tagSuffix,
+                            String buildContext, String dockerfileName, Map<String, String> dockerLabels) {
+
+    String registry = "${System.env.DOCKER_IMAGE ?: project.name}"
+    def dockerLabelsArg = dockerLabels.collect { key, value -> "--label=${key}=${value}" }
+    def annotation = "index:org.opencontainers.image.description=${project.description}"
+
+    tasks.register(taskName, Exec) {
+        dependencies.each { dependsOn it }
+        group 'docker'
+        workingDir 'build/docker'
+        executable 'docker'
+        args = ['buildx', 'build', '--platform', 'linux/amd64,linux/arm64',
+                '--provenance', 'false', '--sbom', 'false'] +
+                dockerLabelsArg +
+                ["--annotation=${annotation}",
+                '-t', "${registry}:${project.version}${tagSuffix}".toLowerCase(),
+                '-f', "${buildContext}/${dockerfileName}", buildContext, '--push']
+    }
+}
+
+registerDockerBuildTask('dockerBuildPushX', ['dockerfile', 'buildLayers'], '', 'main', 'Dockerfile', dockerLabels)
+registerDockerBuildTask('optimizedDockerBuildNativePushX', ['optimizedDockerfileNative',
+                                                            'optimizedDockerPrepareContext',
+                                                            'optimizedBuildNativeLayersTask'],
+        '-optimized-native', 'native-optimized', 'DockerfileNative', dockerLabels)
+
 
 tasks.withType(JavaCompile) {
     options.fork = true
