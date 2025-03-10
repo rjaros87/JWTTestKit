@@ -31,7 +31,7 @@ dependencies {
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
     implementation("io.micronaut:micronaut-jackson-databind")
-    implementation("io.swagger.core.v3:swagger-annotations:2.2.28")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.29")
     implementation("io.micronaut.openapi:micronaut-openapi")
 
     compileOnly("io.micronaut:micronaut-http-client")
