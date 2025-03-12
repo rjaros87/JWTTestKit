@@ -56,10 +56,14 @@ jobs:
 
   cleanup:
     name: ghcr.io cleanup action
+    needs: [build, build-native]
     runs-on: ubuntu-latest
     steps:
       - uses: dataaxiom/ghcr-cleanup-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           package: jwttestkit
+          delete-tags: "*-snapshot,*-snapshot-*"
+          exclude-tags: "1.1-snapshot"
+          delete-untagged: true
           dry-run: true
