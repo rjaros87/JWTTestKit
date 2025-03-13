@@ -4,7 +4,8 @@
 [![Micronaut](https://img.shields.io/badge/Micronaut-4.7-green.svg)](https://micronaut.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-A powerful Micronaut-based toolkit for generating and managing JWT tokens for testing purposes. Perfect for developers who need to simulate identity provider tokens during development and testing phases using **JWKS** endpoint.
+A powerful Micronaut-based toolkit for generating and managing JWT tokens for testing purposes. Perfect for developers 
+who need to simulate identity provider tokens during development and testing phases using **JWKS** endpoint.
 
 ## ✨ Features
 
@@ -93,6 +94,13 @@ micronaut:
             custom:
               url: http://localhost:8080/JWTTestKit/jwks
 ```
+#### Exposed Environment Variables
+
+You can configure the application using the following environment variables:
+
+- `APPLICATION_PORT` – The port on which the JWT Test Kit application runs (default: `8080`).
+- `APPLICATION_HOST` – The host address where the JWT Test Kit application runs (default: `localhost`).
+- `APPLICATION_SCHEME` – The protocol used by the JWT Test Kit application (default: `http`).
 
 ## 🛠️ Building from Source
 
