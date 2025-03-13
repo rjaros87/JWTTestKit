@@ -39,7 +39,7 @@ micronaut:
         signatures:
           jwks:
             JWTTestKit:
-              url: http://localhost:8080/JWTTestKit/jwks
+              url: ${APPLICATION_SCHEMA:http}://${APPLICATION_HOST:localhost}:${APPLICATION_PORT:8080}/JWTTestKit/jwks
 
 endpoints:
   all:
