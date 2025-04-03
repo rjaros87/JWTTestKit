@@ -1,0 +1,25 @@
+meta {
+  name: Create Okta Token
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/JWTTestKit/token/okta
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "sub": "",
+    "name": "",
+    "preferred_username": "",
+    "email": "",
+    "groups": [],
+    "exp": "",
+    "iat": "",
+    "iss": "",
+    "aud": ""
+  }
+}

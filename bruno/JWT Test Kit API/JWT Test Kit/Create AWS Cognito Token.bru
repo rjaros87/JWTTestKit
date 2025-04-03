@@ -1,0 +1,31 @@
+meta {
+  name: Create AWS Cognito Token
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/JWTTestKit/token/aws-cognito
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "exp": "",
+    "sub": "",
+    "device_key": "",
+    "cognito:groups": [],
+    "iss": "",
+    "version": "",
+    "client_id": "",
+    "origin_jti": "",
+    "event_id": "",
+    "token_use": "",
+    "scope": "",
+    "auth_time": "",
+    "iat": "",
+    "jti": "",
+    "username": ""
+  }
+}

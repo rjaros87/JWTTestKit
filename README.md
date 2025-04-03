@@ -4,6 +4,8 @@
 [![Micronaut](https://img.shields.io/badge/Micronaut-4.7-green.svg)](https://micronaut.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
+<a href="https://www.buymeacoffee.com/rjaros87" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="40px"></a>
+
 A powerful Micronaut-based toolkit for generating and managing JWT tokens for testing purposes. Perfect for developers 
 who need to simulate identity provider tokens during development and testing phases using **JWKS** endpoint.
 
@@ -60,6 +62,8 @@ Build native Docker image:
 ```
 
 ## 🔧 API Endpoints
+
+[<img src="https://fetch.usebruno.com/button.svg" alt="Fetch in Bruno" style="width: 130px; height: 30px;" width="128" height="32">](https://fetch.usebruno.com?url=https%3A%2F%2Fgithub.com%2Frjaros87%2FJWTTestKit.git "target=_blank rel=noopener noreferrer")
 
 ### 📚 JWT Token Generation
 - **Swagger UI:** Access the interactive API documentation at http://localhost:8080/api
