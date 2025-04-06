@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  jwt-test-kit:
+  - apiVersion: v2
+    appVersion: 1.1.0
+    created: "2025-04-06T21:37:35.841291268Z"
+    description: A Helm chart for Kubernetes
+    digest: 355f73207fee3e80fe42638b7d168a178a3fb385f2c0e98bc22bb88f163bb751
+    name: jwt-test-kit
+    type: application
+    urls:
+    - https://github.com/rjaros87/JWTTestKit/releases/download/jwt-test-kit-0.1.0/jwt-test-kit-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-04-06T21:37:35.841295366Z"
