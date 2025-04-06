@@ -3,7 +3,7 @@
 image:
   repository: ghcr.io/rjaros87/jwttestkit
   pullPolicy: IfNotPresent
-  tag: 1.0-optimized-native
+  tag: 1.1-snapshot-optimized-native
 
 imagePullSecrets: []
 
