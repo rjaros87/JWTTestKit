@@ -2,6 +2,18 @@ apiVersion: v1
 entries:
   jwt-test-kit:
   - apiVersion: v2
+    appVersion: 1.1-snapshot-optimized-native
+    created: "2025-04-06T22:03:51.577956205Z"
+    description: JWTTestKit is a lightweight tool for testing JWT-based authentication.
+      It generates tokens and hosts a mock JWKS endpoint, simplifying the simulation
+      of authentication flows without real-world services.
+    digest: bd4d7d3e032acad6fa13dd2d4704ceb7c61fe02ade02a2bbc4f55b7bf7360d91
+    name: jwt-test-kit
+    type: application
+    urls:
+    - https://github.com/rjaros87/JWTTestKit/releases/download/jwt-test-kit-1.0.0/jwt-test-kit-1.0.0.tgz
+    version: 1.0.0
+  - apiVersion: v2
     appVersion: 1.1.0
     created: "2025-04-06T21:37:35.841291268Z"
     description: A Helm chart for Kubernetes
@@ -11,4 +23,4 @@ entries:
     urls:
     - https://github.com/rjaros87/JWTTestKit/releases/download/jwt-test-kit-0.1.0/jwt-test-kit-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-06T21:37:35.841295366Z"
+generated: "2025-04-06T22:03:51.577964641Z"
