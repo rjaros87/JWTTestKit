@@ -97,6 +97,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           package: jwttestkit
           delete-tags: "*-snapshot,*-snapshot-*"
-          exclude-tags: "1.1-snapshot"
+          exclude-tags: "1.1-snapshot,1.1-snapshot-optimized-native"
           delete-untagged: true
           dry-run: false

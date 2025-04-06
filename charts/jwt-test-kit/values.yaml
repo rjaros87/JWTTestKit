@@ -1,0 +1,39 @@
+# Default values for jwt-test-kit.
+
+image:
+  repository: ghcr.io/rjaros87/jwttestkit
+  pullPolicy: IfNotPresent
+  tag: 1.0-optimized-native
+
+imagePullSecrets: []
+
+nameOverride: "jwt-test-kit"
+fullnameOverride: "jwt-test-kit"
+
+podAnnotations: {}
+
+podLabels: {}
+
+service:
+  type: ClusterIP
+  targetPort: 8080
+  port: 80
+
+resources:
+   limits:
+     cpu: 100m
+     memory: 128Mi
+   requests:
+     cpu: 100m
+     memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /health/liveness
+    port: 8082
+readinessProbe:
+  httpGet:
+    path: /health/readiness
+    port: 8082
+
+replicaCount: 1
