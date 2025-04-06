@@ -21,6 +21,7 @@ who need to simulate identity provider tokens during development and testing pha
 - 🏥 Health check endpoints for Kubernetes
 - 🐳 Docker support
 - ⚡ Native image support with GraalVM
+- ⎈ Helm chart for easy deployment on Kubernetes
 
 ## 🚀 Getting Started
 
@@ -60,6 +61,22 @@ Build native Docker image:
 ```bash
 ./gradlew dockerBuildNative
 ```
+
+### ⎈ Helm chart
+To deploy the JWT Test Kit on Kubernetes, you can use the provided Helm chart. Follow these steps:
+- Add the Helm repository:
+```bash
+helm repo add jwt-testkit https://rjaros87.github.io/JWTTestKit
+```
+- Update the Helm repository:
+```bash
+helm repo update
+```
+- Install the JWT Test Kit chart:
+```bash
+helm install jwt-testkit jwt-testkit/jwt-testkit
+```
+- Access the application using the service name `jwt-test-kit` and the port default port 80 for http in your Kubernetes cluster.
 
 ## 🔧 API Endpoints
 
