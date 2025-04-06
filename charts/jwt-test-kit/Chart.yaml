@@ -1,6 +1,6 @@
 apiVersion: v2
 name: jwt-test-kit
-description: A Helm chart for Kubernetes
+description: JWTTestKit is a lightweight tool for testing JWT-based authentication. It generates tokens and hosts a mock JWKS endpoint, simplifying the simulation of authentication flows without real-world services.
 type: application
-version: 0.1.0
-appVersion: "1.1.0"
+version: 1.0.0
+appVersion: 1.1-snapshot-optimized-native
