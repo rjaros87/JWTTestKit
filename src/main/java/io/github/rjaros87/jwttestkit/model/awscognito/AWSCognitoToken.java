@@ -94,6 +94,11 @@ public class AWSCognitoToken implements Claims {
         this.username = Optional.ofNullable(username).orElse(this.username);
     }
 
+    public AWSCognitoToken(String clientId, String scope) {
+        this.clientId = Optional.ofNullable(clientId).orElse(this.clientId);
+        this.scope = Optional.ofNullable(scope).orElse(this.scope);
+    }
+
     @Override
     public Object objectToSign() {
         return this;

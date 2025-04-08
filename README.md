@@ -1,7 +1,7 @@
 # JWT Test Kit 🔐
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/projects/jdk/21/)
-[![Micronaut](https://img.shields.io/badge/Micronaut-4.7-green.svg)](https://micronaut.io/)
+[![Micronaut](https://img.shields.io/badge/Micronaut-4.8-green.svg)](https://micronaut.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 <a href="https://www.buymeacoffee.com/rjaros87" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="40px"></a>

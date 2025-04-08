@@ -10,11 +10,7 @@ import io.github.rjaros87.jwttestkit.model.sample.SampleToken;
 import io.github.rjaros87.jwttestkit.utils.TokenSigner;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Consumes;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Base64;
 import java.util.Map;
 
 /**
@@ -178,6 +175,89 @@ public class JWTTestKitController {
     }
 
     /**
+     * Creates a JWT token with AWS Cognito-compatible claims from URL-encoded form data.
+     * <p>
+     * This endpoint expects form parameters and a Basic Authorization header.
+     * The `scope` parameter is required in the form data, and the `clientId` is extracted
+     * from the Basic Authorization header.
+     *
+     * @param formParams Map containing form parameters, including the required `scope`
+     * @param authorizationHeader Basic Authorization header containing the clientId and secret
+     * @return HttpResponse containing the generated token or an error response
+     * @throws JOSEException if there's an error during token signing
+     */
+    @Operation(
+        summary = "Create AWS Cognito Token (URL-encoded)",
+        description = "Creates a JWT token with AWS Cognito-compatible claims from URL-encoded form data. " +
+                "Requires a `scope` parameter in the form data and a Basic Authorization header.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Successfully generated token",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = TokenResponse.class)
+                )
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "Invalid request - missing or malformed form data or Authorization header",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON)
+            )
+        }
+    )
+    @Post("/token/aws-cognito")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public HttpResponse<TokenResponse> createCognitoTokenFromUrlEncoded(
+        @Parameter(
+            description = "Form parameters containing the required `scope`",
+            required = true,
+            content = @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED),
+            schema = @Schema(implementation = Map.class),
+            examples = {
+                @ExampleObject(
+                    name = "Form parameters",
+                    value = "scope=my-scope",
+                    description = "Form data with required `scope` parameter"
+                )
+            }
+        )
+        @Body Map<String, String> formParams,
+        @Parameter(
+                description = "Basic Authorization header containing the clientId and clientSecret",
+                required = true,
+                content = @Content(
+                    mediaType = MediaType.TEXT_PLAIN,
+                    schema = @Schema(type = "string"),
+                    examples = {
+                        @ExampleObject(
+                            name = "Basic Authorization",
+                            value = "Basic Y2xpZW50SWQ6c2VjcmV0",
+                            description = "Base64-encoded clientId:clientSecret"
+                        )
+                    }
+                )
+        )
+        @Header("Authorization") String authorizationHeader) throws JOSEException {
+
+        if (formParams.isEmpty() || authorizationHeader == null) {
+            return HttpResponse.badRequest();
+        }
+
+        String scope = formParams.get("scope");
+
+        // Extract Cognito clientId
+        String[] basicAuthorization = decodeBasicAuth(authorizationHeader).split(":");
+        if (basicAuthorization.length != 2 || scope == null) {
+            return HttpResponse.badRequest();
+        }
+
+        String clientId = basicAuthorization[0];
+
+        return HttpResponse.ok(tokenSigner.sign(new AWSCognitoToken(clientId, scope)));
+    }
+
+    /**
      * Creates a JWT token with Okta-compatible claims.
      *
      * @param body Okta token claims
@@ -305,5 +385,11 @@ public class JWTTestKitController {
             log.error("Error generating custom token due to: {}", e.getMessage());
             return HttpResponse.badRequest();
         }
+    }
+
+    private String decodeBasicAuth(String authorizationHeader) {
+        String base64Credentials = authorizationHeader.substring("Basic ".length());
+        byte[] decodedBytes = Base64.getDecoder().decode(base64Credentials);
+        return new String(decodedBytes);
     }
 }

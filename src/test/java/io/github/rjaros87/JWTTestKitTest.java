@@ -1,5 +1,7 @@
 package io.github.rjaros87;
 
+import com.nimbusds.jose.JOSEException;
+import io.github.rjaros87.jwttestkit.model.TokenResponse;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.client.HttpClient;
@@ -11,6 +13,7 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Base64;
 import java.util.Map;
 
 @MicronautTest
@@ -68,6 +71,56 @@ class JWTTestKitControllerTest {
         Map<String, Object> token = response.body();
         Assertions.assertNotNull(token);
         Assertions.assertNotNull(token.get("access_token"));
+    }
+
+    @Test
+    void testCreateCognitoTokenFromUrlEncoded_Success() throws JOSEException {
+        Map<String, String> formParams = Map.of("scope", "test-scope");
+        String authorizationHeader = "Basic " + Base64.getEncoder().encodeToString("clientId:secret".getBytes());
+
+        HttpRequest<Map<String, String>> request = HttpRequest.POST("/JWTTestKit/token/aws-cognito", formParams)
+                .header("Authorization", authorizationHeader)
+                .contentType("application/x-www-form-urlencoded");
+
+        HttpResponse<Map> response = client.toBlocking().exchange(request, Map.class);
+
+        Assertions.assertEquals(200, response.code());
+        Assertions.assertNotNull(response.body());
+        Assertions.assertNotNull(response.body().get("access_token"));
+    }
+
+    @Test
+    void testCreateCognitoTokenFromUrlEncoded_MissingScope() {
+        Map<String, String> formParams = Map.of();
+        String authorizationHeader = "Basic " + Base64.getEncoder().encodeToString("clientId:secret".getBytes());
+
+        HttpRequest<Map<String, String>> request = HttpRequest.POST("/JWTTestKit/token/aws-cognito", formParams)
+                .header("Authorization", authorizationHeader)
+                .contentType("application/x-www-form-urlencoded");
+
+        try {
+            client.toBlocking().exchange(request, Map.class);
+            Assertions.fail("Expected HttpClientResponseException to be thrown");
+        } catch (HttpClientResponseException e) {
+            Assertions.assertEquals(400, e.getResponse().code(), "Expected 400 Bad Request");
+        }
+    }
+
+    @Test
+    void testCreateCognitoTokenFromUrlEncoded_InvalidAuthorizationHeader() {
+        Map<String, String> formParams = Map.of("scope", "test-scope");
+        String authorizationHeader = "InvalidHeader";
+
+        HttpRequest<Map<String, String>> request = HttpRequest.POST("/JWTTestKit/token/aws-cognito", formParams)
+                .header("Authorization", authorizationHeader)
+                .contentType("application/x-www-form-urlencoded");
+
+        try {
+            client.toBlocking().exchange(request, TokenResponse.class);
+            Assertions.fail("Expected HttpClientResponseException to be thrown");
+        } catch (HttpClientResponseException e) {
+            Assertions.assertEquals(400, e.getResponse().code(), "Expected 400 Bad Request");
+        }
     }
 
     @Test

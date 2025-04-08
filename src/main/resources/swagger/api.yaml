@@ -69,16 +69,22 @@ paths:
     post:
       tags:
       - JWT Test Kit
-      summary: Create AWS Cognito Token
-      description: "Creates a JWT token with AWS Cognito-compatible claims. Requires\
-        \ at least an empty JSON object {} as request body."
-      operationId: createCognitoToken
+      summary: Create AWS Cognito Token (URL-encoded)
+      description: Creates a JWT token with AWS Cognito-compatible claims from URL-encoded
+        form data. Requires a `scope` parameter in the form data and a Basic Authorization
+        header.
+      operationId: createCognitoTokenFromUrlEncoded
       requestBody:
-        description: AWS Cognito token claims
         content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
           application/json:
             schema:
               $ref: "#/components/schemas/AWSCognitoToken"
+            example: null
         required: true
       responses:
         "200":
@@ -88,7 +94,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
         "400":
-          description: Invalid request - missing or malformed request body
+          description: Invalid request - missing or malformed form data or Authorization
+            header
           content:
             application/json: {}
   /JWTTestKit/token/custom:
@@ -100,7 +107,6 @@ paths:
         \ JSON object {} as request body."
       operationId: createCustomToken
       requestBody:
-        description: Custom token claims
         content:
           application/json:
             schema:
@@ -130,7 +136,6 @@ paths:
         \ an empty JSON object {} as request body."
       operationId: createOktaToken
       requestBody:
-        description: Okta token claims
         content:
           application/json:
             schema:
@@ -225,7 +230,6 @@ components:
           type: string
         username:
           type: string
-      description: Represents an AWS Cognito token with various claims.
     CustomToken:
       type: object
       properties:
@@ -237,7 +241,6 @@ components:
         customClaims:
           type: object
           additionalProperties: true
-      description: Represents a custom token with dynamic claims.
     KeysResponse:
       required:
       - private_key
@@ -283,7 +286,6 @@ components:
           type: string
         aud:
           type: string
-      description: Represents an Okta token with various claims.
     TokenResponse:
       required:
       - access_token
@@ -296,7 +298,6 @@ components:
         expires_in:
           type: integer
           format: int64
-      description: Represents a response containing a JWT token.
   securitySchemes:
     bearerAuth:
       type: http
