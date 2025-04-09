@@ -16,6 +16,7 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import io.github.rjaros87.jwttestkit.model.Claims;
 import io.github.rjaros87.jwttestkit.model.KeysResponse;
 import io.github.rjaros87.jwttestkit.model.TokenResponse;
+import io.micronaut.context.annotation.Context;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -30,6 +31,7 @@ import java.util.Map;
  */
 @Slf4j
 @Getter
+@Context
 @Singleton
 public class TokenSigner {
     private static final int RSA_KEY_SIZE = 2048;
