@@ -1,7 +1,7 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.micronaut.application") version "4.5.1"
-    id("io.micronaut.aot") version "4.5.1"
+    id("com.gradleup.shadow") version "8.3.6"
+    id("io.micronaut.application") version "4.5.3"
+    id("io.micronaut.aot") version "4.5.3"
 }
 
 group = "io.github.rjaros87"
@@ -34,17 +34,18 @@ dependencies {
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("io.swagger.core.v3:swagger-annotations:2.2.30")
     implementation("io.micronaut.openapi:micronaut-openapi")
+    implementation("ch.qos.logback:logback-classic")
 
     compileOnly("io.micronaut:micronaut-http-client")
     compileOnly("io.micronaut.openapi:micronaut-openapi-annotations")
     compileOnly("org.projectlombok:lombok")
 
-    runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("org.yaml:snakeyaml")
 
     testImplementation("io.micronaut:micronaut-http-client")
+    testImplementation("org.mockito:mockito-core:5.17.0")
 
-    aotPlugins(platform("io.micronaut.platform:micronaut-platform:4.8.0"))
+    aotPlugins(platform("io.micronaut.platform:micronaut-platform"))
     aotPlugins("io.micronaut.security:micronaut-security-aot")
 }
 

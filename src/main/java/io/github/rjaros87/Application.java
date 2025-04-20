@@ -7,6 +7,11 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 @OpenAPIDefinition(
     info = @Info(
@@ -28,12 +33,26 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         @Server(url = "http://localhost:8080", description = "Local Development Server")
     }
 )
+@Slf4j
 public class Application {
     public static void main(String[] args) {
+        Properties properties = new Properties();
+        try (InputStream input = Application.class.getClassLoader()
+                .getResourceAsStream("micronaut-version.properties")) {
+            if (input != null) {
+                properties.load(input);
+                log.info("Micronaut version: {}", properties.getProperty("micronaut.version", "Unknown"));
+            }
+        } catch (IOException e) {
+            log.warn("Unable to find Micronaut version in properties file: {}", e.getMessage());
+        }
+
         Micronaut
             .build(args)
             .mainClass(Application.class)
             .banner(false)
             .start();
+
+
     }
 }
