@@ -9,12 +9,14 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@DisabledInNativeImage
 class ApplicationTest {
 
     static Logger logger = (Logger) LoggerFactory.getLogger(Application.class);
