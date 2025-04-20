@@ -5,6 +5,7 @@ import com.nimbusds.jose.JOSEException;
 import io.github.rjaros87.jwttestkit.model.TokenResponse;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
@@ -51,6 +52,44 @@ class JWTTestKitControllerTest {
         Map<String, Object> jwks = response.body();
         Assertions.assertNotNull(jwks);
         Assertions.assertTrue(jwks.containsKey("keys"));
+    }
+
+    @Test
+    void testDecodeTokenEndpoint() {
+        String unsignedToken = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJ1c2VyMTIzIn0.";
+
+        HttpRequest<String> request = HttpRequest.POST("/JWTTestKit/decode", unsignedToken)
+                .contentType(MediaType.TEXT_PLAIN);
+
+        HttpResponse<Map> response = client.toBlocking().exchange(request, Map.class);
+
+        Assertions.assertEquals(200, response.code());
+        Map<String, Map<String, Object>> decodedToken = response.body();
+
+        Assertions.assertNotNull(decodedToken);
+        Assertions.assertTrue(decodedToken.containsKey("header"));
+        Assertions.assertTrue(decodedToken.containsKey("payload"));
+
+        Map<String, Object> header = decodedToken.get("header");
+        Map<String, Object> payload = decodedToken.get("payload");
+
+        Assertions.assertEquals("none", header.get("alg"));
+        Assertions.assertEquals("user123", payload.get("sub"));
+    }
+
+    @Test
+    void testDecodeTokenEndpoint_InvalidToken() {
+        String invalidToken = "invalid.token.format";
+
+        HttpRequest<String> request = HttpRequest.POST("/JWTTestKit/decode", invalidToken)
+                .contentType(MediaType.TEXT_PLAIN);
+
+        try {
+            client.toBlocking().exchange(request, Map.class);
+            Assertions.fail("Expected HttpClientResponseException to be thrown");
+        } catch (HttpClientResponseException e) {
+            Assertions.assertEquals(400, e.getStatus().getCode());
+        }
     }
 
     @Test

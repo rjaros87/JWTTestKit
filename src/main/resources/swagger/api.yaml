@@ -20,6 +20,42 @@ tags:
 - name: Secret
   description: Endpoints for testing generated JWT.
 paths:
+  /JWTTestKit/decode:
+    post:
+      tags:
+      - JWT Test Kit
+      summary: Decode JWT
+      description: Decodes a JWT and returns its header and payload components. Works
+        with both signed and unsigned tokens.
+      operationId: decodeToken
+      requestBody:
+        description: the JWT token to decode
+        content:
+          text/plain:
+            schema:
+              type: string
+        required: true
+      responses:
+        "200":
+          description: Successfully decoded token
+          content:
+            application/json:
+              examples:
+                Decoded Token:
+                  description: Example of decoded JWT structure
+                  value:
+                    header:
+                      alg: RS256
+                      typ: JWT
+                    payload:
+                      sub: user123
+                      iss: https://example.com
+                      exp: 1700000000
+                      iat: 1600000000
+        "400":
+          description: Invalid JWT token format
+          content:
+            application/json: {}
   /JWTTestKit/jwks:
     get:
       tags:
@@ -75,6 +111,8 @@ paths:
         header.
       operationId: createCognitoTokenFromUrlEncoded
       requestBody:
+        description: "Map containing form parameters, including the required \\`scope\\\
+          `"
         content:
           application/x-www-form-urlencoded:
             schema:
@@ -107,6 +145,7 @@ paths:
         \ JSON object {} as request body."
       operationId: createCustomToken
       requestBody:
+        description: Custom token claims
         content:
           application/json:
             schema:
@@ -136,6 +175,7 @@ paths:
         \ an empty JSON object {} as request body."
       operationId: createOktaToken
       requestBody:
+        description: Okta token claims
         content:
           application/json:
             schema:
