@@ -1,0 +1,12 @@
+[
+  {
+    "name": "ch.qos.logback.core.status.NopStatusListener",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.classic.encoder.JsonEncoder",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  }
+]
