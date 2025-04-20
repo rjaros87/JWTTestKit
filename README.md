@@ -13,6 +13,7 @@ who need to simulate identity provider tokens during development and testing pha
 
 - 🎯 Generate JWT tokens with custom claims
 - 🔑 JWKS endpoint for key management. See [JWKS Configuration](#jwks-configuration)
+- 🔍 Decode and inspect JWT tokens (signed and unsigned)
 - 🔄 Support for common identity providers:
   - AWS Cognito
   - Okta

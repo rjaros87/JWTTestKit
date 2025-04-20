@@ -1,6 +1,7 @@
 package io.github.rjaros87.jwttestkit.controller;
 
 import com.nimbusds.jose.JOSEException;
+import io.github.rjaros87.jwttestkit.model.Decoder;
 import io.github.rjaros87.jwttestkit.model.KeysResponse;
 import io.github.rjaros87.jwttestkit.model.TokenResponse;
 import io.github.rjaros87.jwttestkit.model.awscognito.AWSCognitoToken;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
 
@@ -39,6 +41,9 @@ public class JWTTestKitController {
 
     @Inject
     private TokenSigner tokenSigner;
+
+    @Inject
+    private Decoder decoder;
 
     /**
      * Retrieves the RSA key pair in PEM format.
@@ -86,6 +91,75 @@ public class JWTTestKitController {
     @Get("/jwks")
     public Map<String, Object> jwks() {
         return tokenSigner.getJwks();
+    }
+
+    /**
+     * Decodes a JWT token and returns its header and payload.
+     *
+     * @param rawJwt the JWT token to decode
+     * @return Map containing the header and payload of the JWT
+     */
+    @Operation(
+            summary = "Decode JWT",
+            description = "Decodes a JWT and returns its header and payload components. Works with both signed and unsigned tokens."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully decoded token",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    examples = {
+                            @ExampleObject(
+                                    name = "Decoded Token",
+                                    value = """
+                    {
+                        "header": {
+                            "alg": "RS256",
+                            "typ": "JWT"
+                        },
+                        "payload": {
+                            "sub": "user123",
+                            "iss": "https://example.com",
+                            "exp": 1700000000,
+                            "iat": 1600000000
+                        }
+                    }
+                    """,
+                                    description = "Example of decoded JWT structure"
+                            )
+                    }
+            )
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid JWT token format",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
+    @Post("/decode")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public HttpResponse<Map<String, Map<String, Object>>> decodeToken(
+            @Parameter(
+                    description = "Decode JWT",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string"),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "JWT Token",
+                                            value = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJ1c2VyMTIzIn0.",
+                                            description = "Raw JWT token string"
+                                    )
+                            }
+                    )
+            )
+            @Body String rawJwt) {
+        try {
+            return HttpResponse.ok(decoder.decode(rawJwt));
+        } catch (ParseException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            return HttpResponse.badRequest();
+        }
     }
 
     /**
