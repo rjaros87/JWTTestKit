@@ -1,10 +1,13 @@
 package io.github.rjaros87;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.runtime.Micronaut;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,25 +15,37 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @DisabledInNativeImage
 class ApplicationTest {
 
-    static Logger logger = (Logger) LoggerFactory.getLogger(Application.class);
-    static ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+    private static TestAppender testAppender;
 
     @BeforeAll
     static void beforeAll() {
-        logger.addAppender(listAppender);
-        listAppender.start();
+        LoggerContext context = LoggerContext.getContext(false);
+        Configuration config = context.getConfiguration();
+
+        testAppender = new TestAppender("TestListAppender");
+        testAppender.start();
+
+        LoggerConfig loggerConfig = config.getLoggerConfig("io.github.rjaros87");
+        loggerConfig.addAppender(testAppender, null, null);
+        context.updateLoggers();
     }
 
     @AfterAll
     static void tearDown() {
-        listAppender.list.clear();
+        LoggerContext context = LoggerContext.getContext(false);
+        Configuration config = context.getConfiguration();
+
+        LoggerConfig loggerConfig = config.getLoggerConfig("io.github.rjaros87");
+        loggerConfig.removeAppender("TestListAppender");
+        testAppender.stop();
+        context.updateLoggers();
     }
 
     @Test
@@ -47,11 +62,14 @@ class ApplicationTest {
 
             Application.main(new String[0]);
 
-            List<ILoggingEvent> logsList = listAppender.list;
+            List<String> logsList = testAppender.getLogEvents().stream()
+                    .map(event -> event.getMessage().getFormattedMessage())
+                    .toList();
+
             boolean containsVersionLog = logsList.stream()
-                    .anyMatch(event -> event.getFormattedMessage().contains("Micronaut version:"));
+                    .anyMatch(message -> message.contains("Micronaut version:"));
             boolean containsUnknownVersionLog = logsList.stream()
-                    .anyMatch(event -> event.getFormattedMessage().contains("Micronaut version: Unknown"));
+                    .anyMatch(message -> message.contains("Micronaut version: Unknown"));
 
             Assertions.assertTrue(containsVersionLog, "Expected log to contain Micronaut version");
             Assertions.assertFalse(containsUnknownVersionLog, "Log should not contain 'Unknown' version");
@@ -60,6 +78,24 @@ class ApplicationTest {
             Mockito.verify(micronautMock).mainClass(Application.class);
             Mockito.verify(micronautMock).banner(false);
             Mockito.verify(micronautMock).start();
+        }
+    }
+
+    private static class TestAppender extends AbstractAppender {
+
+        private final List<LogEvent> logEvents = new ArrayList<>();
+
+        protected TestAppender(String name) {
+            super(name, null, PatternLayout.createDefaultLayout(), false, null);
+        }
+
+        @Override
+        public void append(LogEvent event) {
+            logEvents.add(event.toImmutable());
+        }
+
+        public List<LogEvent> getLogEvents() {
+            return logEvents;
         }
     }
 }
