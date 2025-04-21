@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.text.ParseException;
 import java.util.Base64;
@@ -34,7 +34,7 @@ import java.util.Map;
  * and managing RSA keys used for token signing.
  */
 @Secured(SecurityRule.IS_ANONYMOUS)
-@Slf4j
+@Log4j2
 @Controller("/JWTTestKit")
 @Tag(name = "JWT Test Kit", description = "APIs for JWT token generation and key management")
 public class JWTTestKitController {

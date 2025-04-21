@@ -3,7 +3,7 @@ package io.github.rjaros87.jwttestkit.model;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.text.ParseException;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.Map;
  * Decoder class for decoding JWT tokens.
  * It uses the Nimbus JOSE + JWT library to parse and decode JWT tokens.
  */
-@Slf4j
+@Log4j2
 @Singleton
 public class Decoder {
 

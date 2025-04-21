@@ -14,14 +14,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.security.Principal;
 
 /**
  * Controller for handling secret-related endpoints.
  */
-@Slf4j
+@Log4j2
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/secret")
 @Tag(name = "Secret", description = "Endpoints for testing generated JWT.")
