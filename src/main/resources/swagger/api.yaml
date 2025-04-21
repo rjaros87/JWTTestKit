@@ -270,6 +270,7 @@ components:
           type: string
         username:
           type: string
+      description: Represents an AWS Cognito token with various claims.
     CustomToken:
       type: object
       properties:
@@ -281,6 +282,7 @@ components:
         customClaims:
           type: object
           additionalProperties: true
+      description: Represents a custom token with dynamic claims.
     KeysResponse:
       required:
       - private_key
@@ -326,6 +328,7 @@ components:
           type: string
         aud:
           type: string
+      description: Represents an Okta token with various claims.
     TokenResponse:
       required:
       - access_token
@@ -338,6 +341,7 @@ components:
         expires_in:
           type: integer
           format: int64
+      description: Represents a response containing a JWT token.
   securitySchemes:
     bearerAuth:
       type: http
