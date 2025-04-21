@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Represents a response containing a JWT token.
  */
-@Slf4j
+@Log4j2
 @Introspected
 @Serdeable
 @Getter

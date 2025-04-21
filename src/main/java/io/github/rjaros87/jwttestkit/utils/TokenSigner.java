@@ -2,13 +2,7 @@ package io.github.rjaros87.jwttestkit.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JOSEObjectType;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -20,7 +14,7 @@ import io.micronaut.context.annotation.Context;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -29,7 +23,7 @@ import java.util.Map;
 /**
  * Utility class for signing JWT tokens.
  */
-@Slf4j
+@Log4j2
 @Getter
 @Context
 @Singleton

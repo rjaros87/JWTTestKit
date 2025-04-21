@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ import java.util.Properties;
         @Server(url = "http://localhost:8080", description = "Local Development Server")
     }
 )
-@Slf4j
+@Log4j2
 public class Application {
     public static void main(String[] args) {
         Properties properties = new Properties();

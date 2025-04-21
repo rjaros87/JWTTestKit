@@ -10,8 +10,6 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.serde.config.naming.SnakeCaseStrategy;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +23,6 @@ import java.util.UUID;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AWSCognitoToken implements Claims {
-
-    private static final Logger log = LoggerFactory.getLogger(AWSCognitoToken.class);
 
     @JsonProperty("exp")
     private Long exp = JWTUtils.getDefaultExpTime();
