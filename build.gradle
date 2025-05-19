@@ -37,7 +37,7 @@ dependencies {
     implementation(platform("org.apache.logging.log4j:log4j-bom:2.24.3"))
     implementation("org.apache.logging.log4j:log4j-api")
 
-    implementation("io.swagger.core.v3:swagger-annotations:2.2.30")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.32")
     implementation("com.nimbusds:nimbus-jose-jwt:10.3")
 
     compileOnly("io.micronaut:micronaut-http-client")
